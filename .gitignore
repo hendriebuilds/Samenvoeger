@@ -1,6 +1,7 @@
 logs/
 dist/
 build/
+updateplannen/
 __pycache__/
 *.pyc
 *.pyo
