@@ -36,6 +36,7 @@ jobs:
           APP_VERSION: ${{ github.ref_name }}
         run: |
           .\IntuneWinAppUtil.exe -c dist\Samenvoeger -s install.ps1 -o . -q
+          Rename-Item -Path install.intunewin -NewName Samenvoeger.intunewin
 
       - name: Distributiemap inpakken
         run: Compress-Archive -Path dist\Samenvoeger\* -DestinationPath Samenvoeger-${{ github.ref_name }}.zip
