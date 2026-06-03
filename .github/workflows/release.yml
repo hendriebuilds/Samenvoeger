@@ -43,7 +43,7 @@ jobs:
           Rename-Item -Path Samenvoeger_Setup.intunewin -NewName "Samenvoeger_${{ github.ref_name }}.intunewin"
 
       - name: Distributiemap inpakken
-        run: Compress-Archive -Path dist\Samenvoeger\*, dist\Samenvoeger_Setup.exe -DestinationPath Samenvoeger_${{ github.ref_name }}.zip
+        run: Compress-Archive -Path dist\Samenvoeger_Setup.exe -DestinationPath Samenvoeger_${{ github.ref_name }}.zip
 
       - name: GitHub Release aanmaken
         uses: softprops/action-gh-release@v2
