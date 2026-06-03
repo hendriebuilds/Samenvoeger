@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 from pathlib import Path
 from pypdf import PdfWriter, PdfReader
+from tkinterdnd2 import TkinterDnD, DND_FILES
 
 # =========================================================
 # INSTELLINGEN
@@ -57,7 +58,7 @@ def get_unieke_bestandsnaam(pad: Path) -> Path:
 # =========================================================
 # GUI
 # =========================================================
-class PDFMergerApp(tk.Tk):
+class PDFMergerApp(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
         self.title("Samenvoeger")
@@ -97,6 +98,59 @@ class PDFMergerApp(tk.Tk):
         self.status_lbl.grid(row=4, column=0, columnspan=4, pady=2)
 
         ttk.Button(frame, text="Sluiten", command=self.destroy).grid(row=5, column=1, pady=(8, 0))
+
+        self.drop_target_register(DND_FILES)
+        self.dnd_bind('<<Drop>>', self._on_drop)
+        self.dnd_bind('<<DragEnter>>', self._on_drag_enter)
+        self.dnd_bind('<<DragLeave>>', self._on_drag_leave)
+
+    def _parseer_drop_paden(self, data: str) -> list[Path]:
+        import re
+        tokens = re.findall(r'\{[^}]*\}|[^\s]+', data)
+        return [Path(t.strip('{}')) for t in tokens if t.strip('{}')]
+
+    def _on_drag_enter(self, event):
+        self.status_lbl.config(text="Loslaten om toe te voegen...", fg="blue")
+
+    def _on_drag_leave(self, event):
+        self.status_lbl.config(text="Selecteer een bronmap of PDF-bestanden, en een doelmap", fg="gray")
+
+    def _on_drop(self, event):
+        self.status_lbl.config(text="Selecteer een bronmap of PDF-bestanden, en een doelmap", fg="gray")
+        paden = self._parseer_drop_paden(event.data)
+        if not paden:
+            return
+
+        toegevoegd = 0
+        niet_pdf = 0
+        bestaande_paden = {p for p in self.geselecteerde_bestanden}
+
+        for pad in paden:
+            if pad.is_dir():
+                for pdf in pad.glob("*.pdf"):
+                    if pdf not in bestaande_paden and not is_merged_bestand(pdf.name):
+                        self.geselecteerde_bestanden.append(pdf)
+                        bestaande_paden.add(pdf)
+                        toegevoegd += 1
+            elif pad.suffix.lower() == '.pdf':
+                if pad not in bestaande_paden:
+                    self.geselecteerde_bestanden.append(pad)
+                    bestaande_paden.add(pad)
+                    toegevoegd += 1
+            else:
+                niet_pdf += 1
+
+        if niet_pdf and not toegevoegd:
+            self._set_status("Alleen PDF-bestanden worden ondersteund", "red")
+            return
+
+        totaal = len(self.geselecteerde_bestanden)
+        if totaal:
+            tekst = f"{totaal} PDF-bestand(en) geselecteerd"
+            if niet_pdf:
+                tekst += f"  |  {niet_pdf} niet-PDF overgeslagen"
+            self.input_var.set(tekst)
+            self._set_status(tekst, "gray")
 
     def _kies_map(self, var: tk.StringVar):
         pad = filedialog.askdirectory()

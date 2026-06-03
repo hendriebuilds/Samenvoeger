@@ -19,7 +19,7 @@ jobs:
           python-version: '3.11'
 
       - name: Dependencies installeren
-        run: pip install pypdf pyinstaller
+        run: pip install pypdf tkinterdnd2 pyinstaller
 
       - name: EXE bouwen
         run: pyinstaller Samenvoeger.spec

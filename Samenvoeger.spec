@@ -1,12 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+import os
+from tkinterdnd2 import TkinterDnD
+tkdnd_path = os.path.join(os.path.dirname(TkinterDnD.__file__), 'tkdnd')
 
 a = Analysis(
     ['PDFMerger.py'],
     pathex=[],
     binaries=[],
-    datas=[('icon.ico', '.')],
-    hiddenimports=[],
+    datas=[('icon.ico', '.'), (tkdnd_path, 'tkinterdnd2/tkdnd')],
+    hiddenimports=['tkinterdnd2'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
