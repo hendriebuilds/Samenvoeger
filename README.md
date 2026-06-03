@@ -33,9 +33,11 @@ PDF-bestanden samenvoegen via een eenvoudige Windows-applicatie.
 |---|---|
 | Naam | Samenvoeger |
 | Versie | bijv. `1.3.0` |
-| Installatieopdracht | `Samenvoeger_Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /ALLUSERS` |
-| Verwijderopdracht | `"%ProgramFiles%\Samenvoeger\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART` |
-| Installatiegedrag | Systeem |
+| Installatieopdracht (systeem) | `Samenvoeger_Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /ALLUSERS` |
+| Installatieopdracht (gebruiker/AVD) | `Samenvoeger_Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CURRENTUSER` |
+| Verwijderopdracht (systeem) | `"%ProgramFiles%\Samenvoeger\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART` |
+| Verwijderopdracht (gebruiker/AVD) | `"%LocalAppData%\Programs\Samenvoeger\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART` |
+| Installatiegedrag | Systeem of Gebruiker (afhankelijk van context) |
 
 ### Detectieregel instellen
 
