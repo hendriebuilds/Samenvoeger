@@ -31,7 +31,7 @@ jobs:
       - name: IntuneWinAppUtil downloaden
         run: |
           $url = "https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest/download/IntuneWinAppUtil.exe"
-          Invoke-WebRequest -Uri $url -OutFile IntuneWinAppUtil.exe
+          Invoke-WebRequest -Uri $url -OutFile IntuneWinAppUtil.exe -UseBasicParsing
 
       - name: .intunewin pakket bouwen
         env:
