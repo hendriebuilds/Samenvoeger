@@ -6,8 +6,7 @@ PDF-bestanden samenvoegen via een eenvoudige Windows-applicatie.
 
 ## Lokaal gebruiken
 
-1. Download `Samenvoeger_v*.zip` van de [Releases](../../releases)-pagina.
-2. Pak het zip-bestand uit of voer `Samenvoeger_Setup.exe` uit voor een volledige installatie.
+1. Download `Samenvoeger_Setup.exe` van de [Releases](../../releases)-pagina.
 3. Start `Samenvoeger.exe`.
 4. Selecteer een bronmap of losse PDF-bestanden, kies een doelmap en klik **Start Verwerking**.
 

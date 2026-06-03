@@ -42,16 +42,13 @@ jobs:
           .\IntuneWinAppUtil.exe -c dist -s Samenvoeger_Setup.exe -o . -q
           Rename-Item -Path Samenvoeger_Setup.intunewin -NewName "Samenvoeger_${{ github.ref_name }}.intunewin"
 
-      - name: Distributiemap inpakken
-        run: Compress-Archive -Path dist\Samenvoeger_Setup.exe -DestinationPath Samenvoeger_${{ github.ref_name }}.zip
-
       - name: GitHub Release aanmaken
         uses: softprops/action-gh-release@v2
         with:
           name: Samenvoeger ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           files: |
-            Samenvoeger_${{ github.ref_name }}.zip
+            dist\Samenvoeger_Setup.exe
             Samenvoeger_${{ github.ref_name }}.intunewin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
