@@ -41,8 +41,15 @@ PDF-bestanden samenvoegen via een eenvoudige Windows-applicatie.
 
 ### Detectieregel instellen
 
+**Systeem (/ALLUSERS):**
 - Type: **Bestand**
 - Pad: `%ProgramFiles%\Samenvoeger`
+- Bestandsnaam: `Samenvoeger.exe`
+- Detectiemethode: Bestand bestaat
+
+**Gebruiker/AVD (/CURRENTUSER):**
+- Type: **Bestand**
+- Pad: `%LocalAppData%\Programs\Samenvoeger`
 - Bestandsnaam: `Samenvoeger.exe`
 - Detectiemethode: Bestand bestaat
 
