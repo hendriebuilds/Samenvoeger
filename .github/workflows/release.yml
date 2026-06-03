@@ -26,11 +26,29 @@ jobs:
       - name: Distributiemap inpakken
         run: Compress-Archive -Path dist\Samenvoeger\* -DestinationPath Samenvoeger-${{ github.ref_name }}.zip
 
+      - name: Installer-scripts kopiëren naar distributiemap
+        run: |
+          Copy-Item -Path installer\install.ps1 -Destination dist\Samenvoeger\ -Force
+          Copy-Item -Path installer\uninstall.ps1 -Destination dist\Samenvoeger\ -Force
+
+      - name: IntuneWinAppUtil downloaden
+        run: |
+          $url = "https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest/download/IntuneWinAppUtil.exe"
+          Invoke-WebRequest -Uri $url -OutFile IntuneWinAppUtil.exe
+
+      - name: .intunewin pakket bouwen
+        env:
+          APP_VERSION: ${{ github.ref_name }}
+        run: |
+          .\IntuneWinAppUtil.exe -c dist\Samenvoeger -s install.ps1 -o . -q
+
       - name: GitHub Release aanmaken
         uses: softprops/action-gh-release@v2
         with:
           name: Samenvoeger ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-          files: Samenvoeger-${{ github.ref_name }}.zip
+          files: |
+            Samenvoeger-${{ github.ref_name }}.zip
+            install.intunewin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
