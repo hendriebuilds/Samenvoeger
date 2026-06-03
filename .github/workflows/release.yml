@@ -29,9 +29,7 @@ jobs:
           Copy-Item -Path installer\uninstall.ps1 -Destination dist\Samenvoeger\ -Force
 
       - name: IntuneWinAppUtil downloaden
-        run: |
-          $url = "https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest/download/IntuneWinAppUtil.exe"
-          Invoke-WebRequest -Uri $url -OutFile IntuneWinAppUtil.exe -UseBasicParsing
+        run: curl.exe -L -o IntuneWinAppUtil.exe "https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest/download/IntuneWinAppUtil.exe"
 
       - name: .intunewin pakket bouwen
         env:
