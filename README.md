@@ -32,7 +32,7 @@ PDF-bestanden samenvoegen via een eenvoudige Windows-applicatie.
 | Veld | Waarde |
 |---|---|
 | Naam | Samenvoeger |
-| Versie | bijv. `1.2.0` |
+| Versie | bijv. `1.3.0` |
 | Installatieopdracht | `Samenvoeger_Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /ALLUSERS` |
 | Verwijderopdracht | `"%ProgramFiles%\Samenvoeger\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART` |
 | Installatiegedrag | Systeem |

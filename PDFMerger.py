@@ -5,10 +5,12 @@ import re
 import threading
 import logging
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 from pypdf import PdfWriter, PdfReader
 from tkinterdnd2 import TkinterDnD, DND_FILES
+from settings import load_settings, save_settings
+from printing import print_with_acrobat
 
 # =========================================================
 # INSTELLINGEN
@@ -62,14 +64,16 @@ class PDFMergerApp(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
         self.title("Samenvoeger")
-        self.geometry("700x270")
+        self.geometry("700x305")
         self.resizable(False, False)
         try:
             self.iconbitmap(resource_path("icon.ico"))
         except Exception:
             pass
         self.geselecteerde_bestanden: list = []
+        self._settings = load_settings()
         self._build_ui()
+        self._laad_opgeslagen_paden()
 
     def _build_ui(self):
         pad = {"padx": 10, "pady": 6}
@@ -86,18 +90,24 @@ class PDFMergerApp(TkinterDnD.Tk):
         ttk.Label(frame, text="Doelmap:").grid(row=1, column=0, sticky="w", **pad)
         self.doel_var = tk.StringVar()
         ttk.Entry(frame, textvariable=self.doel_var).grid(row=1, column=1, sticky="ew", **pad)
-        ttk.Button(frame, text="Selecteer", command=lambda: self._kies_map(self.doel_var)).grid(row=1, column=2, columnspan=2, **pad)
+        ttk.Button(frame, text="Selecteer", command=self._kies_doelmap).grid(row=1, column=2, columnspan=2, **pad)
 
         self.start_btn = ttk.Button(frame, text="▶  Start Verwerking", command=self._start)
         self.start_btn.grid(row=2, column=1, pady=(12, 5))
 
+        self.print_var = tk.BooleanVar(value=self._settings.get("print_after_merge", False))
+        ttk.Checkbutton(
+            frame, text="Direct afdrukken na samenvoegen", variable=self.print_var,
+            command=self._sla_print_instelling_op
+        ).grid(row=3, column=1, pady=(0, 6))
+
         self.progress = ttk.Progressbar(frame, length=380, mode="determinate", maximum=100)
-        self.progress.grid(row=3, column=0, columnspan=4, padx=10, pady=4, sticky="ew")
+        self.progress.grid(row=4, column=0, columnspan=4, padx=10, pady=4, sticky="ew")
 
         self.status_lbl = tk.Label(frame, text="Selecteer een bronmap of PDF-bestanden, en een doelmap", fg="gray", anchor="center")
-        self.status_lbl.grid(row=4, column=0, columnspan=4, pady=2)
+        self.status_lbl.grid(row=5, column=0, columnspan=4, pady=2)
 
-        ttk.Button(frame, text="Sluiten", command=self.destroy).grid(row=5, column=1, pady=(8, 0))
+        ttk.Button(frame, text="Sluiten", command=self.destroy).grid(row=6, column=1, pady=(8, 0))
 
         self.drop_target_register(DND_FILES)
         self.dnd_bind('<<Drop>>', self._on_drop)
@@ -162,6 +172,15 @@ class PDFMergerApp(TkinterDnD.Tk):
         if pad:
             self.geselecteerde_bestanden = []
             self.input_var.set(pad)
+            self._settings["last_source_dir"] = pad
+            save_settings(self._settings)
+
+    def _kies_doelmap(self):
+        pad = filedialog.askdirectory()
+        if pad:
+            self.doel_var.set(pad)
+            self._settings["last_output_dir"] = pad
+            save_settings(self._settings)
 
     def _kies_bestanden(self):
         bestanden = filedialog.askopenfilenames(
@@ -171,6 +190,20 @@ class PDFMergerApp(TkinterDnD.Tk):
         if bestanden:
             self.geselecteerde_bestanden = [Path(b) for b in bestanden]
             self.input_var.set(f"{len(bestanden)} PDF-bestand(en) geselecteerd")
+            self._settings["last_source_dir"] = str(Path(bestanden[0]).parent)
+            save_settings(self._settings)
+
+    def _sla_print_instelling_op(self):
+        self._settings["print_after_merge"] = self.print_var.get()
+        save_settings(self._settings)
+
+    def _laad_opgeslagen_paden(self):
+        bron = self._settings.get("last_source_dir", "")
+        if bron and Path(bron).is_dir():
+            self.input_var.set(bron)
+        doel = self._settings.get("last_output_dir", "")
+        if doel and Path(doel).is_dir():
+            self.doel_var.set(doel)
 
     def _set_status(self, tekst: str, kleur: str = "gray"):
         self.after(0, lambda: self.status_lbl.config(text=tekst, fg=kleur))
@@ -268,6 +301,16 @@ class PDFMergerApp(TkinterDnD.Tk):
             samenvatting += f"  |  {len(mislukt)} overgeslagen"
         self._set_status(samenvatting, "green")
         logging.info(f"=== EINDE | {samenvatting} ===")
+
+        if self.print_var.get():
+            if print_with_acrobat(str(merged_path)):
+                logging.info(f"Afdrukken gestart: {merged_path.name}")
+            else:
+                logging.warning("Afdrukken mislukt: Adobe Acrobat niet gevonden")
+                self.after(0, lambda: tk.messagebox.showwarning(
+                    "Afdrukken niet mogelijk",
+                    "Adobe Acrobat niet gevonden. Afdrukken niet mogelijk."
+                ))
 
 
 if __name__ == "__main__":
