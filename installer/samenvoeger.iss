@@ -10,7 +10,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputBaseFilename=Samenvoeger_Setup
-OutputDir=dist
+OutputDir={#SourcePath}\..\dist
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
@@ -24,7 +24,7 @@ Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "dist\Samenvoeger\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}\..\dist\Samenvoeger\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
