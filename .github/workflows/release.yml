@@ -1,0 +1,36 @@
+name: Release Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 3.11 instellen
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Dependencies installeren
+        run: pip install pyinstaller pypdf
+
+      - name: EXE bouwen
+        run: pyinstaller Samenvoeger.spec --noconfirm
+
+      - name: Distributiemap inpakken
+        run: Compress-Archive -Path dist\Samenvoeger\* -DestinationPath Samenvoeger-${{ github.ref_name }}.zip
+
+      - name: GitHub Release aanmaken
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Samenvoeger ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: Samenvoeger-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
