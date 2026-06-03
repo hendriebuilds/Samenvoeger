@@ -29,13 +29,7 @@ jobs:
           Copy-Item -Path installer\uninstall.ps1 -Destination dist\Samenvoeger\ -Force
 
       - name: IntuneWinAppUtil downloaden
-        run: |
-          $release = Invoke-RestMethod "https://api.github.com/repos/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest"
-          Write-Host "Release: $($release.tag_name)"
-          Write-Host "Assets: $(($release.assets | Select-Object -ExpandProperty name) -join ', ')"
-          $asset = $release.assets | Where-Object { $_.name -like "*IntuneWinAppUtil*" }
-          if (-not $asset) { Write-Error "IntuneWinAppUtil niet gevonden in release assets"; exit 1 }
-          curl.exe --fail -L -o IntuneWinAppUtil.exe $asset.browser_download_url
+        run: curl.exe --fail -L -o IntuneWinAppUtil.exe "https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool/raw/master/IntuneWinAppUtil.exe"
 
       - name: .intunewin pakket bouwen
         env:
