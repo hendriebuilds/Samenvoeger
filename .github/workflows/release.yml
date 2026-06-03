@@ -30,8 +30,12 @@ jobs:
 
       - name: IntuneWinAppUtil downloaden
         run: |
-          $downloadUrl = ((Invoke-RestMethod "https://api.github.com/repos/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest").assets | Where-Object name -eq "IntuneWinAppUtil.exe").browser_download_url
-          curl.exe --fail -L -o IntuneWinAppUtil.exe $downloadUrl
+          $release = Invoke-RestMethod "https://api.github.com/repos/microsoft/Microsoft-Win32-Content-Prep-Tool/releases/latest"
+          Write-Host "Release: $($release.tag_name)"
+          Write-Host "Assets: $(($release.assets | Select-Object -ExpandProperty name) -join ', ')"
+          $asset = $release.assets | Where-Object { $_.name -like "*IntuneWinAppUtil*" }
+          if (-not $asset) { Write-Error "IntuneWinAppUtil niet gevonden in release assets"; exit 1 }
+          curl.exe --fail -L -o IntuneWinAppUtil.exe $asset.browser_download_url
 
       - name: .intunewin pakket bouwen
         env:
