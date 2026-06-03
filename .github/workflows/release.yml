@@ -23,6 +23,12 @@ jobs:
       - name: EXE bouwen
         run: pyinstaller Samenvoeger.spec --noconfirm
 
+      - name: Inno Setup installeren
+        run: choco install innosetup --no-progress -y
+
+      - name: Installer bouwen
+        run: iscc installer/samenvoeger.iss
+
       - name: Installer-scripts kopiëren naar distributiemap
         run: |
           Copy-Item -Path installer\install.ps1 -Destination dist\Samenvoeger\ -Force
@@ -32,14 +38,12 @@ jobs:
         run: curl.exe --fail -L -o IntuneWinAppUtil.exe "https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool/raw/master/IntuneWinAppUtil.exe"
 
       - name: .intunewin pakket bouwen
-        env:
-          APP_VERSION: ${{ github.ref_name }}
         run: |
-          .\IntuneWinAppUtil.exe -c dist\Samenvoeger -s install.ps1 -o . -q
-          Rename-Item -Path install.intunewin -NewName Samenvoeger.intunewin
+          .\IntuneWinAppUtil.exe -c dist -s Samenvoeger_Setup.exe -o dist -q
+          Rename-Item -Path dist\Samenvoeger_Setup.intunewin -NewName "Samenvoeger_${{ github.ref_name }}.intunewin"
 
       - name: Distributiemap inpakken
-        run: Compress-Archive -Path dist\Samenvoeger\* -DestinationPath Samenvoeger-${{ github.ref_name }}.zip
+        run: Compress-Archive -Path dist\Samenvoeger\*, dist\Samenvoeger_Setup.exe -DestinationPath Samenvoeger_${{ github.ref_name }}.zip
 
       - name: GitHub Release aanmaken
         uses: softprops/action-gh-release@v2
@@ -47,7 +51,7 @@ jobs:
           name: Samenvoeger ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           files: |
-            Samenvoeger-${{ github.ref_name }}.zip
-            Samenvoeger.intunewin
+            Samenvoeger_${{ github.ref_name }}.zip
+            Samenvoeger_${{ github.ref_name }}.intunewin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
